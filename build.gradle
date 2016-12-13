@@ -1,0 +1,84 @@
+/******************************************
+ * RIOT CORE BRIDGES BUILD GRADLE VERSION *
+ ******************************************/
+
+group 'riot-kafka-client'
+version 'develop'
+
+/***********
+ * PLUGINS *
+ ***********/
+apply plugin: 'java'
+apply plugin: 'idea'
+
+//version for the
+//version = '3.1.2-SNAPSHOT'
+
+/****************
+ * REPOSITORIES *
+ ****************/
+repositories {
+	mavenLocal()
+    mavenCentral()
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+// see http://kennethjorgensen.com/blog/2014/fat-jars-with-excluded-dependencies-in-gradle for explanation
+configurations {
+    provided
+    compile.extendsFrom provided
+}
+
+/****************
+ * DEPENDENCIES *
+ ****************/
+dependencies {
+
+    // yaml
+    compile('com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.6.1')
+    compile "com.fasterxml.jackson.core:jackson-databind:2.6.1"
+    compile "log4j:log4j:1.2.16"
+
+    // https://mvnrepository.com/artifact/com.google.guava/guava
+    compile group: 'com.google.guava', name: 'guava', version: '20.0'
+
+    // https://mvnrepository.com/artifact/commons-cli/commons-cli
+    compile group: 'commons-cli', name: 'commons-cli', version: '1.3.1'
+
+    // https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients
+    compile group: 'org.apache.kafka', name: 'kafka-clients', version: '0.10.0.0'
+
+    // JUnits
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+/***************
+ * SOURCE SETS *
+ ***************/
+sourceSets {
+    main {
+        java {
+            srcDirs = [projectDir.toString() + "/src/main/java"]
+        }
+    }
+    unitTest {
+        java.srcDir file('src/test/java')
+        resources.srcDir file('src/test/resources')
+    }
+}
+
+/*******
+ * JAR *
+ *******/
+jar {
+    from {
+        (configurations.runtime).collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    manifest {
+        attributes("Main-Class": "com.tierconnect.riot.kafka.KafkaClient" )
+    }
+}
